@@ -8,26 +8,40 @@ from eralchemy2 import render_er
 
 Base = declarative_base()
 
-class Person(Base):
+class User(Base):
     __tablename__ = 'person'
-    # Here we define columns for the table person
-    # Notice that each column is also a normal Python instance attribute.
     id = Column(Integer, primary_key=True)
-    name = Column(String(250), nullable=False)
+    firstname = Column(String(250), nullable=False)
+    lastname = Column(String(250), nullable=False)
+    email = Column(String(250), nullable=True)
+    post = relationship('post')
+    comment = relationship('comment.author_id')
+    follower_to = relationship('follower.user_to_id')
+    follower_from = relationship('follower.user_from_id')
 
-class Address(Base):
-    __tablename__ = 'address'
-    # Here we define columns for the table address.
-    # Notice that each column is also a normal Python instance attribute.
+class Post(Base):
+    __tablename__ = 'post'
     id = Column(Integer, primary_key=True)
-    street_name = Column(String(250))
-    street_number = Column(String(250))
-    post_code = Column(String(250), nullable=False)
-    person_id = Column(Integer, ForeignKey('person.id'))
-    person = relationship(Person)
 
-    def to_dict(self):
-        return {}
+class Media(Base):
+    __tablename__ = 'media'
+    id = Column(Integer, primary_key=True)
+    type = Column(String(250))
+    url = Column(String)
+    post_id = Column(ForeignKey('post.id'))
+    post = relationship('post')
+
+class Comment (Base):
+    __tablename__ = 'comment'
+    comment_text = Column(String)
+    author_id = Column(ForeignKey('person.id'))
+    post_id = Column(ForeignKey('post.id'))
+
+class Follower(Base):
+    __tablename__ = 'follower'
+    user_from_id = Column(ForeignKey('person.id'))
+    user_to_id = Column(ForeignKey('person.id'))
+
 
 ## Draw from SQLAlchemy base
 try:
